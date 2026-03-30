@@ -1,0 +1,45 @@
+bundle:
+  name: securing-sensitive-data
+  uuid: 7f12d8f3-1d2e-4e7b-9a91-2d6f7cb4c8e1
+  databricks_cli_version: '>=0.218.0'
+include:
+- resources/*.yml
+sync:
+  include:
+  - code/**
+  - synthetic_data/**
+variables:
+  cluster_id:
+    description: Existing cluster ID used to run the demo job.
+  secret_scope:
+    description: Secret scope used to store the wrapped DEK material.
+  kek_name:
+    description: Name of the key encryption key stored in the key vault table.
+    default: piikeyname
+  keyvault_user:
+    description: User or group granted READ access to the secret scope.
+  data_catalog:
+    description: Catalog used for the demo employee tables and managed volume.
+  data_schema:
+    description: Schema used for the demo employee tables and managed volume.
+  data_volume:
+    description: Managed volume used to stage bundle-synced CSV files at runtime.
+    default: synthetic_data
+  key_catalog:
+    description: Catalog used for the demo key vault objects.
+  key_schema:
+    description: Schema used for the demo key vault objects.
+targets:
+  dev:
+    default: true
+    mode: development
+    variables:
+      secret_scope: piiscope-dev
+      data_schema: ${workspace.current_user.short_name}
+      key_schema: crypto_${workspace.current_user.short_name}
+  prod:
+    mode: production
+    variables:
+      secret_scope: piiscope-prod
+      data_schema: payroll
+      key_schema: crypto

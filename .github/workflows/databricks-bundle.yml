@@ -1,0 +1,73 @@
+name: Databricks Bundle CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-dev:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST_DEV }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_DEV }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate dev bundle
+        run: |
+          databricks bundle validate --target dev \
+            --var="cluster_id=${{ vars.DATABRICKS_CLUSTER_ID_DEV }}" \
+            --var="data_catalog=${{ vars.DATA_CATALOG_DEV }}" \
+            --var="key_catalog=${{ vars.KEY_CATALOG_DEV }}" \
+            --var="keyvault_user=${{ vars.KEYVAULT_USER_DEV }}"
+
+  deploy-prod:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    concurrency: databricks-bundle-prod
+    env:
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST_PROD }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_PROD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate prod bundle
+        run: |
+          databricks bundle validate --target prod \
+            --var="cluster_id=${{ vars.DATABRICKS_CLUSTER_ID_PROD }}" \
+            --var="data_catalog=${{ vars.DATA_CATALOG_PROD }}" \
+            --var="key_catalog=${{ vars.KEY_CATALOG_PROD }}" \
+            --var="keyvault_user=${{ vars.KEYVAULT_USER_PROD }}"
+
+      - name: Deploy prod bundle
+        run: |
+          databricks bundle deploy --target prod \
+            --var="cluster_id=${{ vars.DATABRICKS_CLUSTER_ID_PROD }}" \
+            --var="data_catalog=${{ vars.DATA_CATALOG_PROD }}" \
+            --var="key_catalog=${{ vars.KEY_CATALOG_PROD }}" \
+            --var="keyvault_user=${{ vars.KEYVAULT_USER_PROD }}"
+
+      - name: Run prod job
+        run: |
+          databricks bundle run securing_sensitive_data_demo --target prod \
+            --var="cluster_id=${{ vars.DATABRICKS_CLUSTER_ID_PROD }}" \
+            --var="data_catalog=${{ vars.DATA_CATALOG_PROD }}" \
+            --var="key_catalog=${{ vars.KEY_CATALOG_PROD }}" \
+            --var="keyvault_user=${{ vars.KEYVAULT_USER_PROD }}"
