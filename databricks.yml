@@ -7,7 +7,7 @@ include:
 sync:
   include:
   - code/**
-  - synthetic_data/**
+  - code/sample_data/**
 variables:
   cluster_id:
     description: Existing cluster ID used to run the demo job.

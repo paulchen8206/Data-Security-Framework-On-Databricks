@@ -75,7 +75,7 @@ spark.sql(f"CREATE VOLUME IF NOT EXISTS {qualified_identifier(data_catalog, data
 
 notebook_path = dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
 bundle_root = PurePosixPath(notebook_path).parent.parent
-workspace_data_dir = Path("/Workspace") / bundle_root.relative_to("/") / "synthetic_data"
+workspace_data_dir = Path("/Workspace") / bundle_root.relative_to("/") / "sample_data"
 volume_data_dir = Path(f"/Volumes/{data_catalog}/{data_schema}/{data_volume}")
 volume_data_dir.mkdir(parents=True, exist_ok=True)
 
