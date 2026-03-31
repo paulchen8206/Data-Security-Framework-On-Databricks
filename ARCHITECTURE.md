@@ -136,8 +136,24 @@ flowchart LR
 - Specific encrypting demo script: `code/python/specific_encrypting_demo.py`
 - General encrypting demo job: `resources/general_encrypting_demo_job.yml`
 - General encrypting demo script: `code/python/general_encrypting_demo.py`
+- Shared Python module: `code/python/common/utils.py`
 - Sample data: `code/sample_data/` (staged to a Unity Catalog volume at runtime)
 - CI/CD workflow: `.github/workflows/databricks-bundle.yml`
+
+#### 5.1.1 Import Dependency Map
+
+The demos share common orchestration components through a single module.
+
+```mermaid
+flowchart LR
+  SD[specific_encrypting_demo.py] --> U[common/utils.py]
+  GD[general_encrypting_demo.py] --> U
+
+  U --> C1[DemoConfig + parse_demo_config]
+  U --> C2[SqlTools + SparkSqlTools]
+  U --> C3[DataBootstrap]
+  U --> C4[KeyManagement + DekMaterial]
+```
 
 ### 5.2 Data Objects (Unity Catalog)
 

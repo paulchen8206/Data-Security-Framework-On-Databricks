@@ -27,6 +27,23 @@ A Databricks Asset Bundle demo for securing sensitive payroll data using:
   4. Column mask + row filter applied directly to the payroll table
   5. KEK rotation without rewriting data
 
+## Architecture
+
+Shared logic used by both demo scripts is centralized in `code/python/common/utils.py`.
+
+- `DemoConfig`: runtime configuration model shared across demos.
+- `parse_demo_config(...)`: common CLI argument parsing into `DemoConfig`.
+- `SqlTools`: static SQL string and identifier helpers.
+- `SparkSqlTools`: query execution helpers (`show_query`, `query_scalar`).
+- `DataBootstrap`: common data setup flow (volume staging + employee table creation).
+- `KeyManagement`: common key lifecycle flow (key vault setup, encrypt/decrypt helper UDF creation, DEK secret wrapping/storage, and DEK material re-wrap updates for rotation).
+- `DekMaterial`: in-memory DEK/IV/AAD container used by key operations.
+
+Demo orchestration remains script-specific:
+
+- `code/python/specific_encrypting_demo.py`: encrypted table + manager-scoped decrypted view pattern.
+- `code/python/general_encrypting_demo.py`: direct table protections with column mask, row filter, and KEK rotation walkthrough.
+
 ### Sample Data
 
 - `code/sample_data/employee_hierarchy.csv`: employee IDs, names, and salary
