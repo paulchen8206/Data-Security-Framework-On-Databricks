@@ -1,0 +1,31 @@
+resources:
+  jobs:
+    specific_encrypting_demo_job:
+      name: specific_encrypting_demo_job-${bundle.target}
+      max_concurrent_runs: 1
+      tags:
+        project: specific_encrypting_demo
+        managed_by: databricks-bundle
+        target: ${bundle.target}
+      tasks:
+      - task_key: run_specific_encrypting_demo
+        existing_cluster_id: ${var.cluster_id}
+        spark_python_task:
+          python_file: ../code/python/specific_encrypting_demo.py
+          parameters:
+          - --secret-scope
+          - ${var.secret_scope}
+          - --kek-name
+          - ${var.kek_name}
+          - --keyvault-user
+          - ${var.keyvault_user}
+          - --data-catalog
+          - ${var.data_catalog}
+          - --data-schema
+          - ${var.data_schema}
+          - --data-volume
+          - ${var.data_volume}
+          - --key-catalog
+          - ${var.key_catalog}
+          - --key-schema
+          - ${var.key_schema}

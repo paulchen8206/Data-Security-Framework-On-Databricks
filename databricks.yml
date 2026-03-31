@@ -1,5 +1,5 @@
 bundle:
-  name: securing-sensitive-data
+  name: data-security-framework-on-databricks
   uuid: 7f12d8f3-1d2e-4e7b-9a91-2d6f7cb4c8e1
   databricks_cli_version: '>=0.218.0'
 include:
